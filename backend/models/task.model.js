@@ -17,9 +17,17 @@ const taskSchema = new mongoose.Schema(
       max: 500,
     },
     userId: { type: String, required: true, trim: true },
-    completed: { type: Boolean, required: true, default: false },
+    taskStatus: {
+      type: String,
+      enum: ["To do", "In progress", "Done"],
+      default: "To do",
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+const Task = mongoose.model("Task", taskSchema);
+export default Task;

@@ -1,4 +1,5 @@
 import userRoute from "./user.route.js";
+import taskRoute from "./task.route.js";
 
 export const setupRoute = (app) => {
   // @route GET /api/test
@@ -7,4 +8,5 @@ export const setupRoute = (app) => {
   });
 
   app.use("/api/user", userRoute);
+  app.use("/api/task", taskRoute);
 };
