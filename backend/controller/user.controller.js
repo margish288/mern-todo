@@ -7,7 +7,7 @@ import Validator from "../utils/validator.js";
 const validator = new Validator(); // use for validation
 
 export const registerUser = async (request, response) => {
-  let { username, email, password } = request.body;
+  let { username = "", email = "", password = "" } = request.body;
   try {
     // remove unwanted extra spaces
     username = username.trim();
@@ -97,6 +97,61 @@ export const registerUser = async (request, response) => {
     });
   } catch (error) {
     console.log("Error while registering user: ", error);
+    response.status(500).json({ message: error.message });
+  }
+};
+
+export const loginUser = async (request, response) => {
+  let { email = "", password = "" } = request.body;
+  try {
+    // remove unwanted extra spaces
+    email = email.trim();
+    password = password.trim();
+
+    // Validation of fields
+    const isEmailEmpty = validator.isEmpty(email, "Email");
+    const isPasswordEmpty = validator.isEmpty(password, "Password");
+    if (isEmailEmpty || isPasswordEmpty) {
+      return response
+        .status(400)
+        .json({ message: isEmailEmpty || isPasswordEmpty });
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return response
+        .status(400)
+        .json({ message: "No user found with provided email." });
+    }
+
+    // checking password
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatched) {
+      return response.status(400).json({
+        message: "Oops ! Please check you password it seems incorrect...",
+      });
+    }
+
+    const token = createToken(user._id);
+
+    response.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
+
+    const responseUser = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+    };
+
+    response.status(200).json({
+      user: responseUser,
+      message: "User logged in successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.log("Error while logging in: ", error);
     response.status(500).json({ message: error.message });
   }
 };
