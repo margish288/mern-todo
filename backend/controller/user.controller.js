@@ -155,3 +155,18 @@ export const loginUser = async (request, response) => {
     response.status(500).json({ message: error.message });
   }
 };
+
+export const getUserProfile = async (request, response) => {
+  try {
+    const id = request.user.id;
+    const user = await userModel.findById(id).select("-password");
+    response.status(200).json({
+      user,
+      message: "User profile fetched successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.log("Error while fetching user profile: ", error);
+    response.status(500).json({ message: error.message });
+  }
+};
