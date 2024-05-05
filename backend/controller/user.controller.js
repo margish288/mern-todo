@@ -8,9 +8,7 @@ const validator = new Validator(); // use for validation
 
 export const registerUser = async (request, response) => {
   let { username = "", email = "", password = "" } = request.body;
-  console.log("request.body", request.body);
   try {
-    console.log("request.body", username, email, password);
     // remove unwanted extra spaces
     username = username.trim();
     email = email.trim();
@@ -47,7 +45,6 @@ export const registerUser = async (request, response) => {
     }
 
     const isValidUsername = validator.validateName(username);
-    console.log("isValidUsername", isValidUsername);
     if (!isValidUsername) {
       return response.status(400).json({
         message: "Username must contain atleast 3 characters (only letters)",
