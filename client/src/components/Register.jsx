@@ -48,7 +48,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-purple-200 flex justify-center items-center">
-      <div className="bg-white rounded-lg p-8 max-w-md w-full">
+      <div className="bg-white rounded-lg p-8 max-w-md w-full shadow-xl">
         <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
@@ -65,7 +65,7 @@ const Register = () => {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className="mt-1 p-2 block w-full rounded-md border border-gray-300"
+              className="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:outline-purple-500"
               required
             />
           </div>
@@ -82,7 +82,7 @@ const Register = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="mt-1 p-2 block w-full rounded-md border border-gray-300"
+              className="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:outline-purple-500"
               required
             />
           </div>
@@ -99,7 +99,7 @@ const Register = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="mt-1 p-2 pr-8 block w-full rounded-md border border-gray-300"
+              className="mt-1 p-2 pr-8 block w-full rounded-md border border-gray-300 focus:outline-purple-500"
               required
             />
             <button
