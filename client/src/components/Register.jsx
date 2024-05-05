@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { userRegister } from "../redux/actions/userActions";
 import { IoMdEye } from "react-icons/io";
 import { IoMdEyeOff } from "react-icons/io";
-import { redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -24,15 +24,15 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    dispatch(userRegister(formData));
+    const { email } = formData;
 
-    redirect("/");
+    dispatch(userRegister({ ...formData, email: email.toLowerCase() }));
   };
 
   useEffect(() => {
-    if (userResponse.error) {
-      setError(userResponse.error.message);
-    } else if (userResponse.data) {
+    if (userResponse.status === "failed") {
+      setError(userResponse.data.message);
+    } else if (userResponse.status === "success") {
       localStorage.setItem(
         "token",
         JSON.stringify(userResponse.data.token || "")
@@ -46,11 +46,14 @@ const Register = () => {
     setShowPassword(!showPassword);
   };
 
+  if (userResponse.status === "success") {
+    return <Navigate to="/" />;
+  }
+
   return (
     <div className="min-h-screen bg-purple-200 flex justify-center items-center">
       <div className="bg-white rounded-lg p-8 max-w-md w-full shadow-xl">
         <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -117,8 +120,10 @@ const Register = () => {
             Register
           </button>
         </form>
-
-        <div className="mt-4 text-center">
+        {error && (
+          <p className="text-red-500 text-center text-sm py-4">{error}</p>
+        )}
+        <div className={`text-center ${!error ? "mt-4" : ""}`}>
           Already have an account?{" "}
           <a href="/login" className="text-purple-500">
             Login

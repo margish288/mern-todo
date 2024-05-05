@@ -21,6 +21,12 @@ export const callApi = async (method, url, data) => {
       })
       .catch((err) => {
         // console.log("ERROR in calling API", err);
+
+        if (err.response.status === 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        }
+
         if (err.response) {
           reject(err.response.data);
         } else {

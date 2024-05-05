@@ -17,18 +17,22 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    dispatch(userLogin(formData));
+    const { email } = formData;
+
+    dispatch(userLogin({ ...formData, email: email.toLowerCase() }));
   };
 
   useEffect(() => {
-    if (userResponse.error) {
-      setError(userResponse.error.message);
-    } else if (userResponse.data) {
-      localStorage.setItem(
-        "token",
-        JSON.stringify(userResponse?.data?.token || "")
-      );
-      window.location.href = "/";
+    if (userResponse.status === "failed") {
+      setError(userResponse.data.message);
+    } else if (userResponse.status === "success") {
+      if (userResponse?.data?.token) {
+        localStorage.setItem(
+          "token",
+          JSON.stringify(userResponse?.data?.token)
+        );
+        window.location.href = "/";
+      }
     }
   }, [userResponse]);
 
@@ -40,7 +44,6 @@ const Login = () => {
     <div className="min-h-screen bg-purple-200 flex justify-center items-center">
       <div className="bg-white rounded-lg p-8 max-w-md w-full shadow-xl">
         <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -94,7 +97,10 @@ const Login = () => {
             Login
           </button>
         </form>
-        <div className="mt-4 text-center">
+        {error && (
+          <p className="text-red-500 text-sm py-4 text-center">{error}</p>
+        )}
+        <div className={`text-center ${!error ? "mt-4" : ""}`}>
           Have not created an account?{" "}
           <a href="/register" className="text-purple-500">
             Register
