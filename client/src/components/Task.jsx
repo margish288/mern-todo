@@ -48,10 +48,10 @@ function Task({ task, id }) {
       </div>
       <div className="remove-task text-sm text-white">
         <MdDeleteOutline
-          style={{ fontSize: 30, cursor: "pointer" }}
-          size="large"
+          size={30}
+          style={{ cursor: "pointer" }}
           onClick={handleRemove}
-          className="remove-task-btn bg-blue-700 rounded-full border-2 shadow-2xl border-white p-1"
+          className="remove-task-btn bg-red-700 rounded-full border-2 shadow-2xl border-white p-1"
         />
       </div>
     </div>

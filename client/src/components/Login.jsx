@@ -2,7 +2,6 @@ import React, { useState, useContext } from "react";
 import { Link, Navigate } from "react-router-dom";
 import axios from "../config/axios.js";
 import TokenContext from "../context/TokenContext.js";
-import { getToken } from "../utils/getToken.js";
 import LoginRegisterImage from "../assests/login-register.png";
 
 function Login() {
@@ -14,9 +13,9 @@ function Login() {
     e.preventDefault();
     try {
       const result = await axios.post("/user/login", formData);
-      tokenDispatch({ type: "SET_TOKEN", payload: getToken() });
+      tokenDispatch({ type: "SET_TOKEN", payload: result.data.token });
       userDispatch({ type: "SET_USER", payload: result.data.user });
-      localStorage.setItem("authToken", getToken());
+      localStorage.setItem("token", result.data.token);
     } catch (error) {
       console.log(error);
       setError({ message: error.response.data.message });

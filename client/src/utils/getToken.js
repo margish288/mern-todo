@@ -1,14 +1,9 @@
+import Cookie from "js-cookie";
+
 export const getToken = () => {
-  const cookies = document.cookie;
-  const cookiesArray = cookies.split(";");
-  const parsedCookies = {};
+  return localStorage.getItem("token");
+};
 
-  cookiesArray.forEach((cookie) => {
-    const [name, value] = cookie.trim().split("=");
-    parsedCookies[name] = value;
-  });
-
-  const token = parsedCookies["token"];
-  console.log("getToken", cookiesArray, token);
-  return token;
+export const setToken = (token) => {
+  return localStorage.setItem("token", token);
 };

@@ -5,14 +5,12 @@ import TokenContext from "../context/TokenContext.js";
 import { removeToken } from "../utils/removeToken.js";
 
 function Header() {
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("token");
   const { user } = useContext(TokenContext);
-  console.log("user", user);
 
   const logout = () => {
-    removeToken();
-
-    redirect("/login");
+    localStorage.removeItem("token");
+    window.location.href = "/login";
   };
 
   return (

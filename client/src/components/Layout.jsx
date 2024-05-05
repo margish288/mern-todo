@@ -9,11 +9,11 @@ function Layout() {
       <div className="flex flex-col md:flex-row md:justify-between">
         <CreateTask />
         <div className="task-container w-auto mx-5 md:w-1/3 mt-3">
+          <div className="mb-6">
+            <TaskIndicator />
+          </div>
           <div className="outlet">
             <Outlet />
-          </div>
-          <div className="indicator">
-            <TaskIndicator />
           </div>
         </div>
       </div>

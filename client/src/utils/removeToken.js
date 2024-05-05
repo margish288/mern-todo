@@ -1,4 +1,4 @@
 export const removeToken = () => {
-  localStorage.removeItem("authToken");
+  localStorage.removeItem("token");
   document.cookie = null;
 };

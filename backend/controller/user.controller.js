@@ -96,6 +96,7 @@ export const registerUser = async (request, response) => {
       user: responseUser,
       message: "User registered successfully",
       success: true,
+      token,
     });
   } catch (error) {
     console.log("Error while registering user: ", error);
@@ -151,6 +152,7 @@ export const loginUser = async (request, response) => {
       user: responseUser,
       message: "User logged in successfully",
       success: true,
+      token,
     });
   } catch (error) {
     console.log("Error while logging in: ", error);

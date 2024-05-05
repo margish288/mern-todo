@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from "react";
-import axios from "axios";
+import axios from "./config/axios";
 import tokenReducer from "./reducers/tokenReducer";
 import userReducer from "./reducers/userReducer";
 import taskReducer from "./reducers/taskReducer";
@@ -15,11 +15,9 @@ import Layout from "./components/Layout";
 import AllTask from "./components/AllTask";
 import Active from "./components/Active";
 import Completed from "./components/Completed";
-import { getToken } from "./utils/getToken";
 
 function App() {
-  const token = getToken();
-  console.log("111 ", token);
+  const token = localStorage.getItem("token");
   const [tasks, dispatch] = useReducer(taskReducer, []);
   const [userToken, tokenDispatch] = useReducer(tokenReducer, token);
   const [user, userDispatch] = useReducer(userReducer, {});
@@ -28,13 +26,12 @@ function App() {
     const fetchUser = async () => {
       try {
         // console.log("fetchUser");
-        const res = await axios.get("/user/getUser", {
+        const res = await axios.get("/user/profile", {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
         });
-        tokenDispatch({ type: "SET_TOKEN", payload: res.token });
-        console.log("res.data: ", res.data);
+        tokenDispatch({ type: "SET_TOKEN", payload: userToken });
         userDispatch({ type: "SET_USER", payload: res.data.user });
       } catch (error) {
         console.log(error);

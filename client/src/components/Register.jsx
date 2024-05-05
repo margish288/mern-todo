@@ -3,7 +3,7 @@ import { useState, useContext } from "react";
 import { Navigate, redirect } from "react-router-dom";
 import axios from "../config/axios.js";
 import TokenContext from "../context/TokenContext.js";
-import { getToken } from "../utils/getToken.js";
+
 function Register() {
   const [formData, setFormData] = useState({});
   const { userToken, tokenDispatch, userDispatch } = useContext(TokenContext);
@@ -21,13 +21,13 @@ function Register() {
     try {
       console.log("formData", formData);
       const result = await axios.post("/user/register", formData);
-      tokenDispatch({ type: "SET_TOKEN", payload: getToken() });
+      tokenDispatch({ type: "SET_TOKEN", payload: result.data.token });
       console.log("result", result.data);
       userDispatch({ type: "SET_USER", payload: result.data.user });
-      localStorage.setItem("authToken", getToken());
+      localStorage.setItem("token", result.data.token);
 
       // redirecting to home page
-      redirect("/login");
+      redirect("/");
     } catch (error) {
       console.log(error);
       setError({ message: error.response.data.message });

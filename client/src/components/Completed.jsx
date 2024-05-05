@@ -14,7 +14,7 @@ function Completed() {
           );
         })
       ) : (
-        <h1>No Task Found</h1>
+        <h1 className="text-center">No Task Found</h1>
       )}
     </div>
   );
