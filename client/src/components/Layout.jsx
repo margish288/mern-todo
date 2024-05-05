@@ -16,12 +16,12 @@ const Layout = () => {
     <>
       <Header />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="order-2 md:order-1">
+        <div className="order-1">
           <div className="p-4">
             <CreateTask />
           </div>
         </div>
-        <div className="order-1 md:order-2">
+        <div className="order-2">
           <div className="container mx-auto mt-4">
             <Outlet />
           </div>
