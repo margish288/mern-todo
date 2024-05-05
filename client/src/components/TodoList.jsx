@@ -31,7 +31,7 @@ const TodoList = () => {
       : tasks.filter((task) => task.taskStatus === filter);
 
   return (
-    <div className="m-2 p-4 bg-white rounded-lg shadow-md">
+    <div className="m-2 p-4 bg-white rounded-lg  border shadow-md">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Todo List</h2>
         <div>
