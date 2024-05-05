@@ -1,110 +1,132 @@
-import React from "react";
-import { useState, useContext } from "react";
-import { Navigate, redirect } from "react-router-dom";
-import axios from "../config/axios.js";
-import TokenContext from "../context/TokenContext.js";
+// components/Register.js
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { userRegister } from "../redux/actions/userActions";
+import { IoMdEye } from "react-icons/io";
+import { IoMdEyeOff } from "react-icons/io";
+import { redirect } from "react-router-dom";
 
-function Register() {
-  const [formData, setFormData] = useState({});
-  const { userToken, tokenDispatch, userDispatch } = useContext(TokenContext);
-  const [error, setError] = useState();
+const Register = () => {
+  const dispatch = useDispatch();
+  const userResponse = useSelector((state) => state.user);
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
-  // handling form input change
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // submitting registration form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      console.log("formData", formData);
-      const result = await axios.post("/user/register", formData);
-      tokenDispatch({ type: "SET_TOKEN", payload: result.data.token });
-      console.log("result", result.data);
-      userDispatch({ type: "SET_USER", payload: result.data.user });
-      localStorage.setItem("token", result.data.token);
+    setError("");
+    dispatch(userRegister(formData));
 
-      // redirecting to home page
-      redirect("/");
-    } catch (error) {
-      console.log(error);
-      setError({ message: error.response.data.message });
+    redirect("/");
+  };
+
+  useEffect(() => {
+    if (userResponse.error) {
+      setError(userResponse.error.message);
+    } else if (userResponse.data) {
+      localStorage.setItem(
+        "token",
+        JSON.stringify(userResponse.data.token || "")
+      );
+
+      window.location.href = "/";
     }
+  }, [userResponse]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
-    <div>
-      {userToken && <Navigate to="/" />}
-      <section className="register-container">
-        <div className="container px-6 py-12 h-full">
-          <div className="flex justify-center items-center flex-wrap h-full g-6 text-gray-800">
-            <div className="md:w-8/12 lg:w-6/12 mb-12 md:mb-0">
-              <img
-                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
-                className="w-full"
-                alt="Phone"
-              />
-            </div>
-            <div className="md:w-8/12 lg:w-5/12 lg:ml-20">
-              <div className="mb-10">
-                <h1 className="text-4xl font-bold text-center lg:text-left">
-                  Register
-                </h1>
-              </div>
-
-              <form method="post" onSubmit={handleSubmit}>
-                <div>
-                  {error && (
-                    <div className="text-center border-2 border-green-600 p-2 mb-2 rounded-md bg-red-200 shadow-2xl">
-                      {error.message}
-                    </div>
-                  )}
-                </div>
-                <div className="mb-6">
-                  <input
-                    type="text"
-                    name="username"
-                    className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                    placeholder="User name"
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="mb-6">
-                  <input
-                    type="text"
-                    name="email"
-                    className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                    placeholder="Email address"
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="mb-6">
-                  <input
-                    type="password"
-                    name="password"
-                    className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                    placeholder="Password"
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="inline-block px-7 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out w-full"
-                  data-mdb-ripple="true"
-                  data-mdb-ripple-color="light"
-                >
-                  Register
-                </button>
-              </form>
-            </div>
+    <div className="min-h-screen bg-purple-200 flex justify-center items-center">
+      <div className="bg-white rounded-lg p-8 max-w-md w-full">
+        <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className="mt-1 p-2 block w-full rounded-md border border-gray-300"
+              required
+            />
           </div>
+          <div className="mb-4">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 p-2 block w-full rounded-md border border-gray-300"
+              required
+            />
+          </div>
+          <div className="mb-4 relative">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="mt-1 p-2 pr-8 block w-full rounded-md border border-gray-300"
+              required
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute top-1/2 right-2 transform -translate-y-1 focus:outline-none"
+            >
+              {showPassword ? <IoMdEye size="30" /> : <IoMdEyeOff size="30" />}
+            </button>
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600"
+          >
+            Register
+          </button>
+        </form>
+
+        <div className="mt-4 text-center">
+          Already have an account?{" "}
+          <a href="/login" className="text-purple-500">
+            Login
+          </a>
         </div>
-      </section>
+      </div>
     </div>
   );
-}
+};
 
 export default Register;

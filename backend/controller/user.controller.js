@@ -8,6 +8,7 @@ const validator = new Validator(); // use for validation
 
 export const registerUser = async (request, response) => {
   let { username = "", email = "", password = "" } = request.body;
+  console.log("request.body", request.body);
   try {
     console.log("request.body", username, email, password);
     // remove unwanted extra spaces
@@ -87,7 +88,7 @@ export const registerUser = async (request, response) => {
     // console.log("User registered successfully", user);
 
     const responseUser = {
-      _id: user._id,
+      id: user._id,
       username: user.username,
       email: user.email,
     };
@@ -143,7 +144,7 @@ export const loginUser = async (request, response) => {
     });
 
     const responseUser = {
-      _id: user._id,
+      id: user._id,
       username: user.username,
       email: user.email,
     };
@@ -168,6 +169,7 @@ export const getUserProfile = async (request, response) => {
       user,
       message: "User profile fetched successfully.",
       success: true,
+      token: request.token,
     });
   } catch (error) {
     console.log("Error while fetching user profile: ", error);

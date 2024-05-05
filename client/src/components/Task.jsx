@@ -1,61 +1,49 @@
 import React from "react";
-import moment from "moment";
-import { useContext } from "react";
-import TaskContext from "../context/TaskContext";
 
-import { MdDeleteOutline } from "react-icons/md";
-// import "../css/task.css";
-
-function Task({ task, id }) {
-  const { dispatch } = useContext(TaskContext);
-
-  const handleRemove = (e) => {
-    e.preventDefault();
-
-    dispatch({
-      type: "REMOVE_TASK",
-      id,
-    });
-  };
-
-  const handleMarkDone = (e) => {
-    dispatch({
-      type: "MARK_DONE",
-      id,
-    });
-  };
-
+const Task = ({ task, handleStatusChange }) => {
   return (
-    <div className="bg-slate-300 py-4 rounded-lg shadow-md flex items-center justify-center gap-2 mb-3">
-      <div className="mark-done">
-        <input
-          type="checkbox"
-          className="checkbox"
-          onChange={handleMarkDone}
-          checked={task.completed}
-        />
-      </div>
-      <div className="task-info text-slate-900 text-sm w-10/12">
-        <h4 className="task-title text-lg capitalize">{task.title}</h4>
-        <p className="task-description">{task.description}</p>
-        <div className=" italic opacity-60">
-          {task?.createdAt ? (
-            <p>{moment(task.createdAt).fromNow()}</p>
-          ) : (
-            <p>just now</p>
-          )}
+    <div key={task.id} className="border-b py-2">
+      <h3 className="font-semibold">{task.title}</h3>
+      <p className="text-sm text-gray-600 overflow-wrap break-words">
+        {task.description}
+      </p>
+      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center mt-2">
+        <div>
+          <label className="text-sm font-medium text-gray-700">Status:</label>
+          <span
+            className={`ml-2 px-2 py-1 rounded-md ${
+              task.taskStatus === "To do"
+                ? "bg-red-500 text-white"
+                : task.taskStatus === "In progress"
+                ? "bg-purple-500 text-white"
+                : "bg-green-500 text-white"
+            }`}
+          >
+            {task.taskStatus}
+          </span>
         </div>
-      </div>
-      <div className="remove-task text-sm text-white">
-        <MdDeleteOutline
-          size={30}
-          style={{ cursor: "pointer" }}
-          onClick={handleRemove}
-          className="remove-task-btn bg-red-700 rounded-full border-2 shadow-2xl border-white p-1"
-        />
+        <div>
+          <label
+            htmlFor={`status-${task.id}`}
+            className="text-sm font-medium text-gray-700"
+          >
+            Change:
+          </label>
+          <select
+            id={`status-${task.id}`}
+            name={`status-${task.id}`}
+            value={task.taskStatus}
+            onChange={(e) => handleStatusChange(task.id, e.target.value)}
+            className="ml-2 p-1 border rounded-md focus:outline-purple-500"
+          >
+            <option value="To do">To do</option>
+            <option value="In progress">In progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Task;

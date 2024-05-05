@@ -1,96 +1,128 @@
+// components/CreateTask.js
 import React, { useState } from "react";
-import { useContext } from "react";
-import TaskContext from "../context/TaskContext";
-import TokenContext from "../context/TokenContext";
-import axios from "../config/axios";
-import "../css/createTask.css";
+import { addTask, getAllTask } from "../redux/actions/taskActions";
+import { useDispatch } from "react-redux";
 
-function CreateTask() {
-  const { dispatch } = useContext(TaskContext);
-  const { userToken } = useContext(TokenContext);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  // const [toast, setToast] = useState();
+const CreateTask = () => {
+  const dispatch = useDispatch();
 
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    console.log(userToken);
-    try {
-      await axios.post(
-        "/task/add",
-        { title, description, taskStatus: "To do" },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    status: "",
+  });
 
-      //setToast(res.data)
-      // showToast();
-    } catch (error) {
-      console.log(error);
-    }
-    dispatch({
-      type: "ADD_TASK",
-      title,
-      description,
+  const [error, setError] = useState(null);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
-    setTitle("");
-    setDescription("");
   };
 
-  // const showToast = () => {
-  //     const toast = document.getElementById('toast');
-  //     toast.style.display = "block"
-  //     setTimeout(hideToast,2000)
-  // }
-  // const hideToast = () => {
-  //     const toast = document.getElementById('toast');
-  //     toast.style.display = "none"
-  // }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const taskData = {};
+    form.forEach((value, key) => {
+      taskData[key] = value;
+    });
+
+    const { title, description, taskStatus } = taskData;
+    if (!title || !description || !taskStatus) {
+      setError("All fields are required");
+      return;
+    }
+
+    dispatch(addTask(taskData));
+
+    dispatch(getAllTask());
+
+    setFormData({
+      title: "",
+      description: "",
+      status: "To do",
+    });
+  };
 
   return (
-    <div className="addContainer md:w-1/3 md:mx-auto mx-3 mt-3 flex justify-center">
-      <div className="w-11/12">
-        <form onSubmit={handleAdd}>
-          <div>
-            <label htmlFor="title">Title</label>
-            <input
-              type="text"
-              name="title"
-              id="title"
-              value={title}
-              required
-              onChange={(e) => setTitle(e.target.value)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            />
-          </div>
-          <div className="my-3">
-            <label htmlFor="description">Description</label>
-            <textarea
-              rows={5}
-              name="description"
-              id="description"
-              value={description}
-              required
-              onChange={(e) => setDescription(e.target.value)}
-              style={{ resize: "none" }}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            />
-          </div>
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              className=" bg-blue-700 rounded-md text-white px-5 py-1 "
-            >
-              Add
-            </button>
-          </div>
-        </form>
-      </div>
+    <div
+      className={`p-4 bg-white rounded-lg shadow-md  border ${
+        error
+          ? "border-red-500 shadow-red-200"
+          : "border-purple-400 shadow-purple-200"
+      }`}
+    >
+      <h2 className="text-lg text-center font-semibold mb-4">Create Task</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label
+            htmlFor="title"
+            className="block font-bold text-sm text-gray-700"
+          >
+            Title
+          </label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            className="mt-1 p-2 w-full border rounded-md focus:outline-purple-500"
+          />
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="description"
+            className="block text-sm font-bold text-gray-700"
+          >
+            Description
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="3"
+            className="mt-1 p-2 w-full border rounded-md focus:outline-purple-500"
+          ></textarea>
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="taskStatus"
+            className="block text-sm font-bold text-gray-700"
+          >
+            Status
+          </label>
+          <select
+            id="taskStatus"
+            name="taskStatus"
+            value={formData.taskStatus}
+            onChange={handleChange}
+            className="mt-1 p-2 w-full border rounded-md focus:outline-purple-500"
+          >
+            <option value="To do">To do</option>
+            <option value="In progress">In progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        <div>
+          <button
+            type="submit"
+            className="bg-purple-600 text-white px-4 py-2 rounded-md"
+          >
+            Create
+          </button>
+          {error && (
+            <span className="px-4 py-2 text-base md:text-lg text-red-500">
+              {error}
+            </span>
+          )}
+        </div>
+      </form>
     </div>
   );
-}
+};
 
 export default CreateTask;

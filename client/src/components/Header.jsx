@@ -1,54 +1,31 @@
+// components/Header.js
 import React from "react";
-import { useContext } from "react";
-import { Outlet, NavLink, redirect } from "react-router-dom";
-import TokenContext from "../context/TokenContext.js";
-import { removeToken } from "../utils/removeToken.js";
+import { useDispatch } from "react-redux";
+import { userLogout } from "../redux/actions/userActions";
 
-function Header() {
-  const token = localStorage.getItem("token");
-  const { user } = useContext(TokenContext);
+const Header = () => {
+  const dispatch = useDispatch();
 
-  const logout = () => {
+  const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/login";
+    dispatch(userLogout());
   };
 
   return (
     <div>
-      <nav className="h-12 bg-slate-200 flex justify-between items-center">
-        <div className="w-1/4 text-center">
-          <NavLink to="/" className="text-lg md:text-xl lg:text-2xl">
-            Todo App
-          </NavLink>
-        </div>
-        <div className="flex justify-between">
-          {token ? (
-            <div className="flex items-center justify-center">
-              <p className="mr-5">
-                welcome,{" "}
-                <span className=" text-xl text-blue-800 capitalize">
-                  {user.name}
-                </span>
-              </p>
-              <button onClick={logout} className="logout mr-4">
-                Logout
-              </button>
-            </div>
-          ) : (
-            <ul className="flex justify-end gap-3 w-3/4 pr-6">
-              <li>
-                <NavLink to="/login">Login</NavLink>
-              </li>
-              <li>
-                <NavLink to="/register">Register</NavLink>
-              </li>
-            </ul>
-          )}
-        </div>
-      </nav>
-      <Outlet />
+      <header className="p-2 md:p-4 bg-purple-600 text-white">
+        <nav className="flex justify-between items-center">
+          <h1 className="text-base md:text-lg font-semibold">Todo App</h1>
+          <button
+            className="bg-white text-purple-600 px-2 md:px-3 py-1 rounded-md"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </nav>
+      </header>
     </div>
   );
-}
+};
 
 export default Header;

@@ -1,8 +1,31 @@
 import axios from "axios";
-import { BASE_URL } from "./config";
 
-const axiosInstance = axios.create({
-  baseURL: BASE_URL,
-});
+export const callApi = async (method, url, data) => {
+  const token = JSON.parse(localStorage.getItem("token"));
 
-export default axiosInstance;
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
+
+  return new Promise((resolve, reject) => {
+    axios({
+      url: url,
+      method: method,
+      data,
+      cancelToken: null,
+      headers,
+      responseType: "json",
+    })
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((err) => {
+        // console.log("ERROR in calling API", err);
+        if (err.response) {
+          reject(err.response.data);
+        } else {
+          reject(err);
+        }
+      });
+  });
+};

@@ -1,24 +1,34 @@
 import React from "react";
-import TaskIndicator from "./TaskIndicator";
-import CreateTask from "./CreateTask";
-import { Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Navigate, Outlet } from "react-router-dom";
 
-function Layout() {
+import CreateTask from "./CreateTask";
+import Header from "./Header";
+
+const Layout = () => {
+  const user = useSelector((state) => state.user);
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
   return (
-    <div>
-      <div className="flex flex-col md:flex-row md:justify-between">
-        <CreateTask />
-        <div className="task-container w-auto mx-5 md:w-1/3 mt-3">
-          <div className="mb-6">
-            <TaskIndicator />
+    <>
+      <Header />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="order-2 md:order-1">
+          <div className="p-4">
+            <CreateTask />
           </div>
-          <div className="outlet">
+        </div>
+        <div className="order-1 md:order-2">
+          <div className="container mx-auto mt-4">
             <Outlet />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-}
+};
 
 export default Layout;

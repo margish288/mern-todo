@@ -1,105 +1,108 @@
-import React, { useState, useContext } from "react";
-import { Link, Navigate } from "react-router-dom";
-import axios from "../config/axios.js";
-import TokenContext from "../context/TokenContext.js";
-import LoginRegisterImage from "../assests/login-register.png";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { userLogin } from "../redux/actions/userActions";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
-function Login() {
-  const [formData, setFormData] = useState({});
-  const { userToken, tokenDispatch, userDispatch } = useContext(TokenContext);
-  const [error, setError] = useState();
+const Login = () => {
+  const dispatch = useDispatch();
+  const userResponse = useSelector((state) => state.user);
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const result = await axios.post("/user/login", formData);
-      tokenDispatch({ type: "SET_TOKEN", payload: result.data.token });
-      userDispatch({ type: "SET_USER", payload: result.data.user });
-      localStorage.setItem("token", result.data.token);
-    } catch (error) {
-      console.log(error);
-      setError({ message: error.response.data.message });
-    }
+    setError("");
+    dispatch(userLogin(formData));
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  useEffect(() => {
+    if (userResponse.error) {
+      setError(userResponse.error.message);
+    } else if (userResponse.data) {
+      localStorage.setItem(
+        "token",
+        JSON.stringify(userResponse?.data?.token || "")
+      );
+      window.location.href = "/";
+    }
+  }, [userResponse]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
-    <div>
-      {userToken && <Navigate to="/" />}
-      <section className="login-container">
-        <div className="px-6 h-full text-gray-800">
-          <div className="flex xl:justify-center lg:justify-between justify-center items-center flex-wrap h-full g-6">
-            <div className="grow-0 shrink-1 md:shrink-0 basis-auto xl:w-6/12 lg:w-6/12 md:w-9/12 mb-12 md:mb-0">
-              <img src={LoginRegisterImage} className="w-full" alt="Sample" />
-            </div>
-            <div className="xl:ml-20 xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0">
-              <form method="post" onSubmit={handleSubmit}>
-                <div className="flex justify-start mb-10">
-                  <h1 className="text-4xl font-bold text-center lg:text-left">
-                    Login
-                  </h1>
-                </div>
-
-                <div>
-                  {error && (
-                    <div className="text-center border-2 border-green-600 p-2 mb-2 rounded-md bg-red-200 shadow-2xl">
-                      {error.message}
-                    </div>
-                  )}
-                </div>
-                {/* Email input */}
-                <div className="mb-6">
-                  <input
-                    type="text"
-                    name="email"
-                    onChange={handleChange}
-                    className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                    id="emailInput"
-                    placeholder="Email address"
-                  />
-                </div>
-                {/* Password input */}
-                <div className="mb-6">
-                  <input
-                    type="password"
-                    name="password"
-                    onChange={handleChange}
-                    className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                    id="passInput"
-                    placeholder="Password"
-                  />
-                </div>
-
-                <div className="text-center lg:text-left">
-                  <button
-                    type="submit"
-                    onClick={handleSubmit}
-                    className="inline-block px-7 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-                  >
-                    Login
-                  </button>
-                  <p className="text-sm font-semibold mt-2 pt-1 mb-0">
-                    Don't have an account?
-                    <Link
-                      to={"/register"}
-                      className="text-red-600 hover:text-red-700 focus:text-red-700 transition duration-200 ease-in-out"
-                    >
-                      {" "}
-                      Register
-                    </Link>
-                  </p>
-                </div>
-              </form>
-            </div>
+    <div className="min-h-screen bg-purple-200 flex justify-center items-center">
+      <div className="bg-white rounded-lg p-8 max-w-md w-full">
+        <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 p-2 block w-full rounded-md border border-gray-300"
+              required
+            />
           </div>
+          <div className="mb-4 relative">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="mt-1 p-2 pr-8 block w-full rounded-md border border-gray-300"
+              required
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute top-1/2 right-2 transform -translate-y-1 focus:outline-none"
+            >
+              {showPassword ? (
+                <IoMdEye size={30} className="" />
+              ) : (
+                <IoMdEyeOff size={30} className="" />
+              )}
+            </button>
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600"
+          >
+            Login
+          </button>
+        </form>
+        <div className="mt-4 text-center">
+          Have not created an account?{" "}
+          <a href="/register" className="text-purple-500">
+            Register
+          </a>
         </div>
-      </section>
+      </div>
     </div>
   );
-}
+};
 
 export default Login;
